@@ -1,0 +1,31 @@
+apply plugin: 'application'
+
+version = '1.0'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+mainClassName = 'com.hideakin.app.PoConsole'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile files('../org.eclipse.swt/swt.jar')
+    testCompile 'junit:junit:4.12'
+}
+
+startScripts {
+    applicationName = 'poconsole'
+}
+
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'PoConsole Executable Jar',
+        	'Implementation-Version': version,
+        	'Main-Class': 'com.hideakin.app.PoConsole'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
