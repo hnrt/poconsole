@@ -1,5 +1,6 @@
 # poconsole
-Simple po file editor with SWT
+
+Simple gettext portable object file editor with SWT
 
 ## Prerequites to build
 
