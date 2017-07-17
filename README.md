@@ -1,6 +1,6 @@
 # poconsole
 
-This is a SWT application of simple .po file (gettext portable object file) editor.
+This is an SWT application of simple .po file (gettext portable object file) editor.
 
 ## Prerequites to build
 
