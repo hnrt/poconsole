@@ -69,6 +69,15 @@ public class EditableTable {
         tableEditor = new TableEditor(table);
         tableEditor.grabHorizontal = true;
 
+        table.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.keyCode == SWT.CR && (e.stateMask & (SWT.CTRL | SWT.ALT | SWT.SHIFT)) == 0) {
+                    enterEdit();
+                }
+            }
+        });
+
         table.addMouseListener(new MouseListener() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
@@ -118,8 +127,19 @@ public class EditableTable {
         });
         text.addKeyListener(new KeyAdapter() {
             @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.keyCode == SWT.CR && (e.stateMask & (SWT.CTRL | SWT.ALT | SWT.SHIFT)) == 0) {
+                    e.doit = false;
+                }
+            }
+            @Override
             public void keyReleased(KeyEvent e) {
-                if (e.keyCode == SWT.ESC) {
+                if (e.keyCode == SWT.CR) {
+                    if ((e.stateMask & (SWT.CTRL | SWT.ALT | SWT.SHIFT)) == 0) {
+                        e.doit = false;
+                        leaveEdit();
+                    }
+                } else if (e.keyCode == SWT.ESC) {
                     cancelEdit();
                 }
             }
@@ -154,6 +174,7 @@ public class EditableTable {
         item.setText(STATUS_COLUMN, str.isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
         text.dispose();
         text = null;
+        table.setSelection(item);
         if (editCompleteListener != null) {
             EditEvent e = new EditEvent();
             e.document = document;
@@ -172,6 +193,7 @@ public class EditableTable {
         item.setText(STATUS_COLUMN, str.isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
         text.dispose();
         text = null;
+        table.setSelection(item);
     }
 
     public void set(TranslationDocument document) {
