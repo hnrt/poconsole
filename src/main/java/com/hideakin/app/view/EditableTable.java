@@ -153,7 +153,7 @@ public class EditableTable {
                             e.keyCode, e.stateMask, (int)e.character);
                 }
                 // Observation of Anthy Input Method on CentOS 6.9
-                // Conversion of a single character completed by ENTER yields a single keyPressd with keyCode=CR and character=CR. 
+                // Conversion of a single character completed by ENTER yields a single keyPressd with keyCode=CR and character=actual.
                 // Conversion of multiple characters completed by ENTER yields multiple keyPressed with keyCode=0 and character=actual.
                 // In both cases, a single keyReleased follows with keyCode=CR and character=CR.
                 // Note: Shell.getImeInputMode() always returns 0, which means it doesn't look to be working correctly.
