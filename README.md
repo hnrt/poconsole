@@ -1,12 +1,14 @@
 # poconsole
 
-Simple gettext portable object file editor with SWT
+This is a SWT application of simple .po file (gettext portable object file) editor.
 
 ## Prerequites to build
 
-Download SWT binary and source zip file from http://download.eclipse.org/eclipse/downloads/ and import it into the workspace.
+This project has been created and developed by using eclipse.
 
-This project is of eclipse. It assumes that swt.jar is located in ../org.eclipse.swt directory.
+Download SWT binary and source zip file from http://download.eclipse.org/eclipse/downloads/ and import it into the workspace by using Existing Projects into Workspace.
+
+It is assumed that swt.jar is located in ../org.eclipse.swt directory.
 
 ## How to build
 
