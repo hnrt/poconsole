@@ -145,7 +145,8 @@ public class EventHandler {
 
     public void saveFile() {
         try {
-            mainContext.save();
+            TranslationDocument document = mainContext.save();
+            document.createBackup();
             mainWindow.getTable().updateStatus();
         } catch (FileIoError error) {
             MessageBox box = new MessageBox(mainWindow.getShell(), SWT.ICON_ERROR | SWT.OK);
@@ -209,23 +210,27 @@ public class EventHandler {
 
 
     public boolean editInProgress() {
-        return mainWindow.editInProgress();
+        return mainWindow.getTable().editInProgress();
     }
 
     public boolean canEnterEdit() {
-        return mainWindow.canEnterEdit();
+        return mainWindow.getTable().canEnterEdit();
     }
 
     public void enterEdit() {
-        mainWindow.enterEdit();
+        mainWindow.getTable().enterEdit();
     }
 
     public void leaveEdit() {
-        mainWindow.leaveEdit();
+        mainWindow.getTable().leaveEdit();
     }
 
     public void cancelEdit() {
-        mainWindow.cancelEdit();
+        mainWindow.getTable().cancelEdit();
+    }
+
+    public void revertEdit() {
+        mainWindow.getTable().revertEdit();
     }
 
 }

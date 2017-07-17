@@ -57,6 +57,22 @@ public class EditMenu {
             
         });
 
+        MenuItem itemRevertChange = new MenuItem(menu, SWT.PUSH);
+        itemRevertChange.setText("&Revert edit");
+        itemRevertChange.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                EventHandler.getInstance().revertEdit();
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                widgetSelected(e);
+            }
+            
+        });
+
         menu.addMenuListener(new MenuListener() {
             
             @Override
@@ -69,14 +85,17 @@ public class EditMenu {
                     itemChange.setText("&Leave edit mode");
                     itemChange.setEnabled(true);
                     itemCancelChange.setEnabled(true);
+                    itemRevertChange.setEnabled(false);
                 } else if (EventHandler.getInstance().canEnterEdit()) {
                     itemChange.setText("&Enter edit mode");
                     itemChange.setEnabled(true);
                     itemCancelChange.setEnabled(false);
+                    itemRevertChange.setEnabled(true);
                 } else {
                     itemChange.setText("&Enter edit mode");
                     itemChange.setEnabled(false);
                     itemCancelChange.setEnabled(false);
+                    itemRevertChange.setEnabled(false);
                 }
             }
 

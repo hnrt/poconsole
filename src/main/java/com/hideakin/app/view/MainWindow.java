@@ -61,24 +61,4 @@ public class MainWindow {
                     file.getParent()));
     }
 
-    public boolean editInProgress() {
-        return table.editInProgress();
-    }
-
-    public boolean canEnterEdit() {
-        return table.canEnterEdit();
-    }
-
-    public void enterEdit() {
-        table.enterEdit();
-    }
-
-    public void leaveEdit() {
-        table.leaveEdit();
-    }
-
-    public void cancelEdit() {
-        table.cancelEdit();
-    }
-
 }

@@ -93,4 +93,10 @@ public class TranslationDocument {
         }
     }
 
+    public void createBackup() {
+        for (TranslationUnit tu : tuList) {
+            tu.createBackup();
+        }
+    }
+
 }

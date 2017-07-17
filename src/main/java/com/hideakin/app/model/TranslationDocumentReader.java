@@ -94,7 +94,7 @@ public class TranslationDocumentReader implements Closeable {
                         throw new ParseError(line, ERROR_MSGSTR_VALUE);
                     }
                 } else {
-                    tu.makeBackup();
+                    tu.createBackup();
                     return tu;
                 }
                 break;
@@ -107,7 +107,7 @@ public class TranslationDocumentReader implements Closeable {
         case STATE_START_PENDING:
             return null;
         case STATE_MSGSTR:
-            tu.makeBackup();
+            tu.createBackup();
             return tu;
         default:
             throw new ParseError(line, ERROR_EOS);

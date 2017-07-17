@@ -186,11 +186,11 @@ public class MainContext {
         return document;
     }
 
-    public void save() throws FileIoError {
-        save(document.getPath());
+    public TranslationDocument save() throws FileIoError {
+        return save(document.getPath());
     }
 
-    public void save(String path) throws FileIoError {
+    public TranslationDocument save(String path) throws FileIoError {
         String path2 = FileUtility.getTempPath(path);
         String path3 = FileUtility.getBackupPath(path);
         document.save(path2);
@@ -205,6 +205,7 @@ public class MainContext {
         } catch (Exception e) {
             throw new FileIoError(path, e);
         }
+        return document;
     }
 
     private String getAppDirPath() {

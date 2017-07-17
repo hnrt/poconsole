@@ -28,7 +28,7 @@ public class TranslationUnit {
             value.add(s);
         }
 
-        public boolean empty() {
+        public boolean isEmpty() {
             return size() == 0 || (size() == 1 && get(0).isEmpty());
         }
 
@@ -83,7 +83,9 @@ public class TranslationUnit {
         public void set(String s) {
             value.clear();
             String[] ss = s.split("\n");
-            if (ss.length == 1) {
+            if (ss.length == 0) {
+                value.add("");
+            } else if (ss.length == 1) {
                 value.add(ss[0]);
             } else if (ss.length > 1) {
                 value.add("");
@@ -124,8 +126,12 @@ public class TranslationUnit {
         return msgstr;
     }
     
-    public void makeBackup() {
+    public void createBackup() {
         msgstrBackup = msgstr.clone();
+    }
+
+    public void revert() {
+        msgstr = msgstrBackup.clone();
     }
 
     public boolean isChanged() {

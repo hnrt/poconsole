@@ -43,7 +43,7 @@ public class FileMenu {
         });
 
         MenuItem itemSave = new MenuItem(menu, SWT.PUSH);
-        itemSave.setText("&Save...");
+        itemSave.setText("&Save");
         itemSave.addSelectionListener(new SelectionListener() {
 
             @Override

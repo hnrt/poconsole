@@ -39,12 +39,15 @@ public class EditableTable {
     private static final String CHANGED = "CHANGED";
     private static final String EMPTY = "EMPTY";
     private static final String EDITING = "EDITING";
-    
+    private static final boolean DEBUG_KBD = false;
+
     private Table table;
     private TableEditor tableEditor;
     private Text text;
     private TranslationDocument document;
     private EditCompleteListener editCompleteListener;
+    private boolean enterEditPending; // to work properly with menu navigation
+    private boolean leaveEditPending; // to work properly with IME interaction
 
     public EditableTable(Composite parent) {
         table = new Table(parent, SWT.BORDER | SWT.FULL_SELECTION);
@@ -69,12 +72,29 @@ public class EditableTable {
         tableEditor = new TableEditor(table);
         tableEditor.grabHorizontal = true;
 
+        table.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                enterEditPending = false;
+                leaveEditPending = false;
+            }
+        });
+
         table.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.keyCode == SWT.CR && (e.stateMask & (SWT.CTRL | SWT.ALT | SWT.SHIFT)) == 0) {
+                    enterEditPending = true;
+                }
+            }
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.keyCode == SWT.CR && (e.stateMask & (SWT.CTRL | SWT.ALT | SWT.SHIFT)) == 0) {
-                    enterEdit();
+                    if (enterEditPending) {
+                        enterEdit();
+                    }
                 }
+                enterEditPending = false;
             }
         });
 
@@ -128,14 +148,29 @@ public class EditableTable {
         text.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.keyCode == SWT.CR && (e.stateMask & (SWT.CTRL | SWT.ALT | SWT.SHIFT)) == 0) {
+                if (DEBUG_KBD) {
+                    System.out.printf(" pressed: code=%x mask=%x char=%x\n",
+                            e.keyCode, e.stateMask, (int)e.character);
+                }
+                // Observation of Anthy Input Method on CentOS 6.9
+                // Conversion of a single character completed by ENTER yields a single keyPressd with keyCode=CR and character=CR. 
+                // Conversion of multiple characters completed by ENTER yields multiple keyPressed with keyCode=0 and character=actual.
+                // In both cases, a single keyReleased follows with keyCode=CR and character=CR.
+                // Note: Shell.getImeInputMode() always returns 0, which means it doesn't look to be working correctly.
+                if (e.keyCode == SWT.CR && (e.stateMask & (SWT.CTRL | SWT.ALT | SWT.SHIFT)) == 0 && e.character == '\r') {
                     e.doit = false;
+                    leaveEditPending = true;
                 }
             }
             @Override
             public void keyReleased(KeyEvent e) {
-                if (e.keyCode == SWT.CR) {
-                    if ((e.stateMask & (SWT.CTRL | SWT.ALT | SWT.SHIFT)) == 0) {
+                if (DEBUG_KBD) {
+                    System.out.printf("released: code=%x mask=%x char=%x\n",
+                            e.keyCode, e.stateMask, (int)e.character);
+                }
+                if (leaveEditPending) {
+                    leaveEditPending = false;
+                    if (e.keyCode == SWT.CR && (e.stateMask & (SWT.CTRL | SWT.ALT | SWT.SHIFT)) == 0) {
                         e.doit = false;
                         leaveEdit();
                     }
@@ -160,18 +195,18 @@ public class EditableTable {
         text.setFocus();
         text.selectAll();
         item.setText(STATUS_COLUMN, EDITING);
+        leaveEditPending = false;
     }
 
     public void leaveEdit() {
         if (text == null) {
             return;
         }
-        String str = text.getText();
         TableItem item = tableEditor.getItem();
-        item.setText(EDIT_COLUMN, str);
         TranslationUnit tu = (TranslationUnit)item.getData();
-        tu.getStr().set(str);
-        item.setText(STATUS_COLUMN, str.isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+        tu.getStr().set(text.getText());
+        item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+        item.setText(EDIT_COLUMN, tu.getStr().toString());
         text.dispose();
         text = null;
         table.setSelection(item);
@@ -189,25 +224,42 @@ public class EditableTable {
         }
         TableItem item = tableEditor.getItem();
         TranslationUnit tu = (TranslationUnit)item.getData();
-        String str =  tu.getStr().toString();
-        item.setText(STATUS_COLUMN, str.isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+        item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
         text.dispose();
         text = null;
         table.setSelection(item);
+    }
+
+    public void revertEdit() {
+        if (text != null) {
+            return;
+        }
+        int index = table.getSelectionIndex();
+        if (index == -1) {
+            return;
+        }
+        TableItem item = table.getItem(index);
+        TranslationUnit tu = (TranslationUnit)item.getData();
+        tu.revert();
+        item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : UNCHANGED);
+        item.setText(EDIT_COLUMN, tu.getStr().toString());
+        if (editCompleteListener != null) {
+            EditEvent e = new EditEvent();
+            e.document = document;
+            e.translateUnit = tu;
+            editCompleteListener.editComplete(e);
+        }
     }
 
     public void set(TranslationDocument document) {
         table.setItemCount(0);
         List<TranslationUnit> tuList = document.getTranslationUnit();
         for (TranslationUnit tu : tuList) {
-            String id = tu.getId().toString();
-            String str =  tu.getStr().toString();
-            String status = str.isEmpty() ? EMPTY : UNCHANGED;
             TableItem item = new TableItem(table, SWT.NULL);
-            item.setText(STATUS_COLUMN, status);
-            item.setText(LINE_COLUMN, "" + tu.getLine());
-            item.setText(ID_COLUMN, id);
-            item.setText(EDIT_COLUMN, str);
+            item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : UNCHANGED);
+            item.setText(LINE_COLUMN, "" + tu.getLine() + tu.getHeader().size());
+            item.setText(ID_COLUMN, tu.getId().toString());
+            item.setText(EDIT_COLUMN, tu.getStr().toString());
             item.setData(tu);
         }
         this.document = document;
@@ -224,9 +276,13 @@ public class EditableTable {
         for (int index = 0; index < count; index++) {
             TableItem item = table.getItem(index);
             TranslationUnit tu = (TranslationUnit)item.getData();
-            String str =  tu.getStr().toString();
-            String status = str.isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED;
-            item.setText(STATUS_COLUMN, status);
+            item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+        }
+        if (editCompleteListener != null) {
+            EditEvent e = new EditEvent();
+            e.document = document;
+            e.translateUnit = null;
+            editCompleteListener.editComplete(e);
         }
     }
 
