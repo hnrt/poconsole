@@ -3,6 +3,8 @@
  */
 package com.hideakin.app.view;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -15,6 +17,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -48,23 +51,84 @@ public class EditableTable {
     private EditCompleteListener editCompleteListener;
     private boolean enterEditPending; // to work properly with menu navigation
     private boolean leaveEditPending; // to work properly with IME interaction
+    private int selectedHeader;
+    private boolean[] reverseOrder;
 
     public EditableTable(Composite parent) {
         table = new Table(parent, SWT.BORDER | SWT.FULL_SELECTION);
 
-        TableColumn col;
-        col = new TableColumn(table, SWT.LEFT);
-        col.setText(STATUS);
-        col.setWidth(100);
-        col = new TableColumn(table, SWT.LEFT);
-        col.setText(LINE);
-        col.setWidth(100);
-        col = new TableColumn(table, SWT.LEFT);
-        col.setText(MSGID);
-        col.setWidth(300);
-        col = new TableColumn(table, SWT.LEFT);
-        col.setText(MSGSTR);
-        col.setWidth(300);
+        selectedHeader = -1;
+        reverseOrder = new boolean[4];
+        Arrays.fill(reverseOrder, false);
+
+        TableColumn colStatus = new TableColumn(table, SWT.LEFT);
+        colStatus.setText(STATUS);
+        colStatus.setWidth(100);
+        colStatus.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetDefaultSelected(SelectionEvent arg0) {
+                widgetSelected(arg0);
+            }
+            @Override
+            public void widgetSelected(SelectionEvent arg0) {
+                if (selectedHeader == STATUS_COLUMN) {
+                    reverseOrder[STATUS_COLUMN] = !reverseOrder[STATUS_COLUMN];
+                }
+                EditableTable.this.sortByStatus(reverseOrder[STATUS_COLUMN]);
+                selectedHeader = STATUS_COLUMN;
+            }
+        });
+        TableColumn colLine = new TableColumn(table, SWT.LEFT);
+        colLine.setText(LINE);
+        colLine.setWidth(100);
+        colLine.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetDefaultSelected(SelectionEvent arg0) {
+                widgetSelected(arg0);
+            }
+            @Override
+            public void widgetSelected(SelectionEvent arg0) {
+                if (selectedHeader == LINE_COLUMN) {
+                    reverseOrder[LINE_COLUMN] = !reverseOrder[LINE_COLUMN];
+                }
+                EditableTable.this.sortByLine(reverseOrder[LINE_COLUMN]);
+                selectedHeader = LINE_COLUMN;
+            }
+        });
+        TableColumn colId = new TableColumn(table, SWT.LEFT);
+        colId.setText(MSGID);
+        colId.setWidth(300);
+        colId.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetDefaultSelected(SelectionEvent arg0) {
+                widgetSelected(arg0);
+            }
+            @Override
+            public void widgetSelected(SelectionEvent arg0) {
+                if (selectedHeader == ID_COLUMN) {
+                    reverseOrder[ID_COLUMN] = !reverseOrder[ID_COLUMN];
+                }
+                EditableTable.this.sortById(reverseOrder[ID_COLUMN]);
+                selectedHeader = ID_COLUMN;
+            }
+        });
+        TableColumn colStr = new TableColumn(table, SWT.LEFT);
+        colStr.setText(MSGSTR);
+        colStr.setWidth(300);
+        colStr.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetDefaultSelected(SelectionEvent arg0) {
+                widgetSelected(arg0);
+            }
+            @Override
+            public void widgetSelected(SelectionEvent arg0) {
+                if (selectedHeader == EDIT_COLUMN) {
+                    reverseOrder[EDIT_COLUMN] = !reverseOrder[EDIT_COLUMN];
+                }
+                EditableTable.this.sortByStr(reverseOrder[EDIT_COLUMN]);
+                selectedHeader = EDIT_COLUMN;
+            }
+        });
 
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
@@ -257,7 +321,7 @@ public class EditableTable {
         for (TranslationUnit tu : tuList) {
             TableItem item = new TableItem(table, SWT.NULL);
             item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : UNCHANGED);
-            item.setText(LINE_COLUMN, "" + tu.getLine() + tu.getHeader().size());
+            item.setText(LINE_COLUMN, "" + (tu.getLine() + tu.getHeader().size()));
             item.setText(ID_COLUMN, tu.getId().toString());
             item.setText(EDIT_COLUMN, tu.getStr().toString());
             item.setData(tu);
@@ -286,4 +350,75 @@ public class EditableTable {
         }
     }
 
+    public void sortByLine(boolean reverseOrder) {
+        redisplay(document.getTranslationUnit(), reverseOrder);
+    }
+
+    public void sortByStatus(boolean reverseOrder) {
+        List<TranslationUnit> tuList = document.getTranslationUnit();
+        List<TranslationUnit> sorted = new ArrayList<>(tuList.size());
+        for (TranslationUnit tu1 : tuList) {
+            int x1 = tu1.getStr().isEmpty() ? 0 : tu1.isChanged() ? 1 : 2;
+            for (int index = 0;; index++) {
+                if (index >= sorted.size()) {
+                    sorted.add(tu1);
+                    break;
+                }
+                TranslationUnit tu2 = sorted.get(index); 
+                int x2 = tu2.getStr().isEmpty() ? 0 : tu2.isChanged() ? 1 : 2;
+                if (x1 < x2) {
+                    sorted.add(index, tu1);
+                    break;
+                }
+            }
+        }
+        redisplay(sorted, reverseOrder);
+    }
+
+    public void sortById(boolean reverseOrder) {
+        List<TranslationUnit> tuList = document.getTranslationUnit();
+        List<TranslationUnit> sorted = new ArrayList<>(tuList.size());
+        for (TranslationUnit tu : tuList) {
+            for (int index = 0;; index++) {
+                if (index >= sorted.size()) {
+                    sorted.add(tu);
+                    break;
+                } else if (tu.getId().toString().compareTo(sorted.get(index).getId().toString()) < 0) {
+                    sorted.add(index, tu);
+                    break;
+                }
+            }
+        }
+        redisplay(sorted, reverseOrder);
+    }
+
+    public void sortByStr(boolean reverseOrder) {
+        List<TranslationUnit> tuList = document.getTranslationUnit();
+        List<TranslationUnit> sorted = new ArrayList<>(tuList.size());
+        for (TranslationUnit tu : tuList) {
+            for (int index = 0;; index++) {
+                if (index >= sorted.size()) {
+                    sorted.add(tu);
+                    break;
+                } else if (tu.getStr().toString().compareTo(sorted.get(index).getStr().toString()) < 0) {
+                    sorted.add(index, tu);
+                    break;
+                }
+            }
+        }
+        redisplay(sorted, reverseOrder);
+    }
+
+    private void redisplay(List<TranslationUnit> tuList, boolean reverseOrder) {
+        int index = reverseOrder ? tuList.size() - 1 : 0;
+        for (TranslationUnit tu : tuList) {
+            TableItem item = table.getItem(index);
+            item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+            item.setText(LINE_COLUMN, "" + (tu.getLine() + tu.getHeader().size()));
+            item.setText(ID_COLUMN, tu.getId().toString());
+            item.setText(EDIT_COLUMN, tu.getStr().toString());
+            item.setData(tu);
+            index += reverseOrder ? -1 : 1;
+        }
+    }
 }
