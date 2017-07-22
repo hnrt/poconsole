@@ -181,6 +181,10 @@ public class EditableTable {
             }
         });
     }
+    
+    public void setLayoutData(Object data) {
+        table.setLayoutData(data);
+    }
 
     public void setEditCompleteListener(EditCompleteListener listener) {
         editCompleteListener = listener;
@@ -421,4 +425,52 @@ public class EditableTable {
             index += reverseOrder ? -1 : 1;
         }
     }
+
+    public boolean canFind() {
+        return document != null && table.getItemCount() > 0;
+    }
+
+    public void find(String value, boolean caseSensitive, boolean forwardDirection) {
+        if (document == null) {
+            return;
+        }
+        int itemCount = table.getItemCount();
+        if (itemCount == 0) {
+            return;
+        }
+        if (!caseSensitive) {
+            value = value.toUpperCase();
+        }
+        int index;
+        if (forwardDirection) {
+            index = (table.getSelectionIndex() + 1) % itemCount;
+        } else {
+            index = table.getSelectionIndex();
+            if (index < 0) {
+                index = itemCount - 1;
+            } else {
+                index = (index + itemCount - 1) % itemCount;
+            }
+        }
+        for (int count = itemCount; count > 0; count--) {
+            TableItem item = table.getItem(index);
+            TranslationUnit tu = (TranslationUnit)item.getData();
+            if (caseSensitive) {
+                if (tu.getId().toString().contains(value) || tu.getStr().toString().contains(value)) {
+                    table.setSelection(item);
+                    return;
+                }
+            } else if (tu.getId().toString().toUpperCase().contains(value) ||
+                    tu.getStr().toString().toUpperCase().contains(value)) {
+                table.setSelection(item);
+                return;
+            }
+            if (forwardDirection) {
+                index = (index + 1) % itemCount;
+            } else {
+                index = (index + itemCount - 1) % itemCount;
+            }
+        }
+    }
+
 }

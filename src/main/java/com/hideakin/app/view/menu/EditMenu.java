@@ -73,6 +73,22 @@ public class EditMenu {
             
         });
 
+        MenuItem itemFind = new MenuItem(menu, SWT.PUSH);
+        itemFind.setText("&Find...");
+        itemFind.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                EventHandler.getInstance().find();
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                widgetSelected(e);
+            }
+            
+        });
+
         menu.addMenuListener(new MenuListener() {
             
             @Override
@@ -97,6 +113,7 @@ public class EditMenu {
                     itemCancelChange.setEnabled(false);
                     itemRevertChange.setEnabled(false);
                 }
+                itemFind.setEnabled(EventHandler.getInstance().canFind());
             }
 
         });

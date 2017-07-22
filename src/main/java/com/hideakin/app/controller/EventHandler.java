@@ -233,4 +233,21 @@ public class EventHandler {
         mainWindow.getTable().revertEdit();
     }
 
+    public boolean canFind() {
+        return mainWindow.getTable().canFind();
+    }
+
+    public void find() {
+        mainWindow.getSearchBar().setVisible(true);
+        mainWindow.getShell().layout();
+    }
+
+    public void findForward(String value, boolean caseSensitive) {
+        mainWindow.getTable().find(value, caseSensitive, true);
+    }
+
+    public void findBackward(String value, boolean caseSensitive) {
+        mainWindow.getTable().find(value, caseSensitive, false);
+    }
+
 }
