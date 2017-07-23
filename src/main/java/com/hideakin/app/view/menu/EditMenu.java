@@ -22,6 +22,34 @@ public class EditMenu {
         Menu menu = new Menu(itemEdit);
         itemEdit.setMenu(menu);
         
+        MenuItem itemCopyKey = new MenuItem(menu, SWT.PUSH);
+        itemCopyKey.setText("&Copy msgid");
+        itemCopyKey.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                EventHandler.getInstance().copyKey();
+            }
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                widgetSelected(e);
+            }
+        });
+
+        MenuItem itemCopyVal = new MenuItem(menu, SWT.PUSH);
+        itemCopyVal.setText("Copy msg&str");
+        itemCopyVal.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                EventHandler.getInstance().copyVal();
+            }
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                widgetSelected(e);
+            }
+        });
+
+        new MenuItem(menu, SWT.SEPARATOR);
+
         MenuItem itemChange = new MenuItem(menu, SWT.PUSH);
         itemChange.addSelectionListener(new SelectionListener() {
 
@@ -42,7 +70,7 @@ public class EditMenu {
         });
 
         MenuItem itemCancelChange = new MenuItem(menu, SWT.PUSH);
-        itemCancelChange.setText("&Cancel edit");
+        itemCancelChange.setText("Ca&ncel edit");
         itemCancelChange.addSelectionListener(new SelectionListener() {
 
             @Override
@@ -99,6 +127,9 @@ public class EditMenu {
 
             @Override
             public void menuShown(MenuEvent e) {
+                boolean canCopy = EventHandler.getInstance().canCopy();
+                itemCopyKey.setEnabled(canCopy);
+                itemCopyVal.setEnabled(canCopy);
                 if (EventHandler.getInstance().editInProgress()) {
                     itemChange.setText("&Leave edit mode");
                     itemChange.setEnabled(true);

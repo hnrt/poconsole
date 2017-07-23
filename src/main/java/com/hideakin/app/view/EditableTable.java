@@ -474,4 +474,28 @@ public class EditableTable {
         return 0;
     }
 
+    public boolean hasSelection() {
+        return table.getSelectionIndex() >= 0;
+    }
+
+    public String getSelectedKey() {
+        int index = table.getSelectionIndex();
+        if (index < 0) {
+            return null;
+        }
+        TableItem item = table.getItem(index);
+        TranslationUnit tu = (TranslationUnit)item.getData();
+        return tu.getKey().toString();
+    }
+
+    public String getSelectedVal() {
+        int index = table.getSelectionIndex();
+        if (index < 0) {
+            return null;
+        }
+        TableItem item = table.getItem(index);
+        TranslationUnit tu = (TranslationUnit)item.getData();
+        return tu.getVal().toString();
+    }
+
 }

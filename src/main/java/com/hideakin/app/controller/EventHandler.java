@@ -5,8 +5,13 @@ package com.hideakin.app.controller;
 
 import java.io.File;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -212,6 +217,35 @@ public class EventHandler {
         openFile(path, false);
     }
 
+    public boolean canCopy() {
+        return mainWindow.getTable().hasSelection();
+    }
+
+    public void copyKey() {
+        String key = mainWindow.getTable().getSelectedKey();
+        if (key == null) {
+            return;
+        }
+        Clipboard clipboard = new Clipboard(Display.getCurrent());
+        TextTransfer textTransfer = TextTransfer.getInstance();
+        Transfer[] transfers = new Transfer[] { textTransfer };
+        Object[] data = new Object[] { key };
+        clipboard.setContents(data, transfers, DND.CLIPBOARD);
+        clipboard.dispose();
+    }
+
+    public void copyVal() {
+        String val = mainWindow.getTable().getSelectedVal();
+        if (val == null) {
+            return;
+        }
+        Clipboard clipboard = new Clipboard(Display.getCurrent());
+        TextTransfer textTransfer = TextTransfer.getInstance();
+        Transfer[] transfers = new Transfer[] { textTransfer };
+        Object[] data = new Object[] { val };
+        clipboard.setContents(data, transfers, DND.CLIPBOARD);
+        clipboard.dispose();
+    }
 
     public boolean editInProgress() {
         return mainWindow.getTable().editInProgress();
