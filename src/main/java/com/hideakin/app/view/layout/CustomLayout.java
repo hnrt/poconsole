@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Layout;
 
 public class CustomLayout extends Layout {
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private int direction;
 

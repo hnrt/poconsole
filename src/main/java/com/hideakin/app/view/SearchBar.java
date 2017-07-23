@@ -85,6 +85,9 @@ public class SearchBar extends Composite {
             }
             @Override
             public void widgetSelected(SelectionEvent event) {
+                if (clearResult) {
+                    showResult(null);
+                }
                 SearchBar.this.setVisible(false);
                 parent.layout();
             }
@@ -106,6 +109,9 @@ public class SearchBar extends Composite {
             }
             @Override
             public void widgetSelected(SelectionEvent event) {
+                if (clearResult) {
+                    showResult(null);
+                }
                 int subject = 0;
                 if (keyButton.getSelection()) {
                     subject |= EventHandler.KEY; 
@@ -127,6 +133,9 @@ public class SearchBar extends Composite {
             }
             @Override
             public void widgetSelected(SelectionEvent event) {
+                if (clearResult) {
+                    showResult(null);
+                }
                 int subject = 0;
                 if (keyButton.getSelection()) {
                     subject |= EventHandler.KEY; 

@@ -18,7 +18,9 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -42,6 +44,14 @@ public class EditableTable {
     private static final String CHANGED = "CHANGED";
     private static final String EMPTY = "EMPTY";
     private static final String EDITING = "EDITING";
+    private static final Color EMPTY_FGCOLOR = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
+    private static final Color EMPTY_BGCOLOR = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_MAGENTA);
+    private static final Color EDITING_FGCOLOR = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+    private static final Color EDITING_BGCOLOR = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+    private static final Color CHANGED_FGCOLOR = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
+    private static final Color CHANGED_BGCOLOR = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
+    private static final Color ODD_BGCOLOR = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+    private static final Color EVEN_BGCOLOR = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
     private static final boolean DEBUG_KBD = false;
 
     private Table table;
@@ -262,7 +272,7 @@ public class EditableTable {
         tableEditor.setEditor(text, item, VAL_COLUMN);
         text.setFocus();
         text.selectAll();
-        item.setText(STATUS_COLUMN, EDITING);
+        setStatusTextToEditing(item);
         leaveEditPending = false;
     }
 
@@ -273,7 +283,7 @@ public class EditableTable {
         TableItem item = tableEditor.getItem();
         TranslationUnit tu = (TranslationUnit)item.getData();
         tu.getVal().set(text.getText());
-        item.setText(STATUS_COLUMN, tu.getVal().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+        setStatusText(item, tu, table.indexOf(item));
         item.setText(VAL_COLUMN, tu.getVal().toString());
         text.dispose();
         text = null;
@@ -292,7 +302,7 @@ public class EditableTable {
         }
         TableItem item = tableEditor.getItem();
         TranslationUnit tu = (TranslationUnit)item.getData();
-        item.setText(STATUS_COLUMN, tu.getVal().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+        setStatusText(item, tu, table.indexOf(item));
         text.dispose();
         text = null;
         table.setSelection(item);
@@ -309,7 +319,7 @@ public class EditableTable {
         TableItem item = table.getItem(index);
         TranslationUnit tu = (TranslationUnit)item.getData();
         tu.revert();
-        item.setText(STATUS_COLUMN, tu.getVal().isEmpty() ? EMPTY : UNCHANGED);
+        setStatusText(item, tu, index);
         item.setText(VAL_COLUMN, tu.getVal().toString());
         if (editCompleteListener != null) {
             EditEvent e = new EditEvent();
@@ -324,7 +334,7 @@ public class EditableTable {
         List<TranslationUnit> tuList = document.getTranslationUnit();
         for (TranslationUnit tu : tuList) {
             TableItem item = new TableItem(table, SWT.NULL);
-            item.setText(STATUS_COLUMN, tu.getVal().isEmpty() ? EMPTY : UNCHANGED);
+            setStatusText(item, tu, table.indexOf(item));
             item.setText(LINE_COLUMN, "" + (tu.getLine() + tu.getHeader().size()));
             item.setText(KEY_COLUMN, tu.getKey().toString());
             item.setText(VAL_COLUMN, tu.getVal().toString());
@@ -344,7 +354,7 @@ public class EditableTable {
         for (int index = 0; index < count; index++) {
             TableItem item = table.getItem(index);
             TranslationUnit tu = (TranslationUnit)item.getData();
-            item.setText(STATUS_COLUMN, tu.getVal().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+            setStatusText(item, tu, index);
         }
         if (editCompleteListener != null) {
             EditEvent e = new EditEvent();
@@ -352,6 +362,29 @@ public class EditableTable {
             e.translateUnit = null;
             editCompleteListener.editComplete(e);
         }
+    }
+
+    private static void setStatusText(TableItem item, TranslationUnit tu, int index) {
+        if (tu.getVal().isEmpty()) {
+            item.setText(STATUS_COLUMN, EMPTY);
+            item.setForeground(STATUS_COLUMN, EMPTY_FGCOLOR);
+            item.setBackground(STATUS_COLUMN, EMPTY_BGCOLOR);
+        } else if (tu.isChanged()) {
+            item.setText(STATUS_COLUMN, CHANGED);
+            item.setForeground(STATUS_COLUMN, CHANGED_FGCOLOR);
+            item.setBackground(STATUS_COLUMN, CHANGED_BGCOLOR);
+        } else {
+            Color bgColor = (index & 1) == 0 ? ODD_BGCOLOR : EVEN_BGCOLOR;
+            item.setText(STATUS_COLUMN, UNCHANGED);
+            item.setForeground(STATUS_COLUMN, item.getForeground(LINE_COLUMN));
+            item.setBackground(STATUS_COLUMN, bgColor);
+        }
+    }
+
+    private static void setStatusTextToEditing(TableItem item) {
+        item.setText(STATUS_COLUMN, EDITING);
+        item.setForeground(STATUS_COLUMN, EDITING_FGCOLOR);
+        item.setBackground(STATUS_COLUMN, EDITING_BGCOLOR);
     }
 
     public void sortByLine(boolean reverseOrder) {
@@ -417,7 +450,7 @@ public class EditableTable {
         int index = reverseOrder ? tuList.size() - 1 : 0;
         for (TranslationUnit tu : tuList) {
             TableItem item = table.getItem(index);
-            item.setText(STATUS_COLUMN, tu.getVal().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+            setStatusText(item, tu, index);
             item.setText(LINE_COLUMN, "" + (tu.getLine() + tu.getHeader().size()));
             item.setText(KEY_COLUMN, tu.getKey().toString());
             item.setText(VAL_COLUMN, tu.getVal().toString());
