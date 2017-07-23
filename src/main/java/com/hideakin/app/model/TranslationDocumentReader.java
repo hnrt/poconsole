@@ -57,7 +57,7 @@ public class TranslationDocumentReader implements Closeable {
                     state = STATE_MSGID;
                     String s = parseQuotedString(text, parseStartOfQuotedString(text, MSGID.length()));
                     if (s != null) {
-                        tu.getId().add(s);
+                        tu.getKey().add(s);
                     } else {
                         throw new ParseError(line, ERROR_MSGID_VALUE);
                     }
@@ -69,7 +69,7 @@ public class TranslationDocumentReader implements Closeable {
                 if (!text.isEmpty() && text.charAt(0) == QUOTATION_MARK) {
                     String s = parseQuotedString(text, 1);
                     if (s != null) {
-                        tu.getId().add(s);
+                        tu.getKey().add(s);
                     } else {
                         throw new ParseError(line, ERROR_MSGID_VALUE);
                     }
@@ -77,7 +77,7 @@ public class TranslationDocumentReader implements Closeable {
                     state = STATE_MSGSTR;
                     String s = parseQuotedString(text, parseStartOfQuotedString(text, MSGSTR.length()));
                     if (s != null) {
-                        tu.getStr().add(s);
+                        tu.getVal().add(s);
                     } else {
                         throw new ParseError(line, ERROR_MSGSTR_VALUE);
                     }
@@ -89,7 +89,7 @@ public class TranslationDocumentReader implements Closeable {
                 if (!text.isEmpty() && text.charAt(0) == QUOTATION_MARK) {
                     String s = parseQuotedString(text, 1);
                     if (s != null) {
-                        tu.getStr().add(s);
+                        tu.getVal().add(s);
                     } else {
                         throw new ParseError(line, ERROR_MSGSTR_VALUE);
                     }

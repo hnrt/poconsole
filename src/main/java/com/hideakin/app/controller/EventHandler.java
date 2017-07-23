@@ -14,9 +14,13 @@ import org.eclipse.swt.widgets.Shell;
 import com.hideakin.app.exception.FileIoError;
 import com.hideakin.app.model.MainContext;
 import com.hideakin.app.model.TranslationDocument;
+import com.hideakin.app.view.EditableTable;
 import com.hideakin.app.view.MainWindow;
 
 public class EventHandler {
+
+    public static final int KEY = 1 << EditableTable.KEY_COLUMN;
+    public static final int VAL = 1 << EditableTable.VAL_COLUMN;
 
     private static EventHandler singleton;
 
@@ -238,16 +242,12 @@ public class EventHandler {
     }
 
     public void find() {
-        mainWindow.getSearchBar().setVisible(true);
+        mainWindow.getSearchBar().setVisible(!mainWindow.getSearchBar().getVisible());
         mainWindow.getShell().layout();
     }
 
-    public void findForward(String value, boolean caseSensitive) {
-        mainWindow.getTable().find(value, caseSensitive, true);
-    }
-
-    public void findBackward(String value, boolean caseSensitive) {
-        mainWindow.getTable().find(value, caseSensitive, false);
+    public int find(String value, boolean caseSensitive, int subject, boolean forwardDirection) {
+        return mainWindow.getTable().find(value, caseSensitive, subject, forwardDirection);
     }
 
 }

@@ -73,6 +73,8 @@ public class EditMenu {
             
         });
 
+        new MenuItem(menu, SWT.SEPARATOR);
+
         MenuItem itemFind = new MenuItem(menu, SWT.PUSH);
         itemFind.setText("&Find...");
         itemFind.addSelectionListener(new SelectionListener() {

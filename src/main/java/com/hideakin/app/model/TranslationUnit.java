@@ -51,7 +51,7 @@ public class TranslationUnit {
 
         @Override
         public String toString() {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             if (size() == 1) {
                 buf.append(get(0));
             } else if (size() > 1) {
@@ -99,15 +99,15 @@ public class TranslationUnit {
 
     private int line;
     private StringList header;
-    private StringList msgid;
-    private StringList msgstr;
-    private StringList msgstrBackup;
+    private StringList key;
+    private StringList val;
+    private StringList backup;
 
     public TranslationUnit(int line) {
         this.line = line;
         header = new StringList();
-        msgid = new StringList();
-        msgstr = new StringList();
+        key = new StringList();
+        val = new StringList();
     }
 
     public int getLine() {
@@ -118,24 +118,24 @@ public class TranslationUnit {
         return header;
     }
 
-    public StringList getId() {
-        return msgid;
+    public StringList getKey() {
+        return key;
     }
 
-    public StringList getStr() {
-        return msgstr;
+    public StringList getVal() {
+        return val;
     }
     
     public void createBackup() {
-        msgstrBackup = msgstr.clone();
+        backup = val.clone();
     }
 
     public void revert() {
-        msgstr = msgstrBackup.clone();
+        val = backup.clone();
     }
 
     public boolean isChanged() {
-        return !msgstr.equals(msgstrBackup);
+        return !val.equals(backup);
     }
 
     @Override
@@ -150,20 +150,20 @@ public class TranslationUnit {
             buf.append("]");
             buf.append(header.get(i));
         }
-        buf.append(",msgid:");
-        for (int i = 0; i < msgid.size(); i++) {
+        buf.append(",key:");
+        for (int i = 0; i < key.size(); i++) {
             buf.append("[");
             buf.append(i);
             buf.append("]\"");
-            buf.append(msgid.get(i));
+            buf.append(key.get(i));
             buf.append("\"");
         }
-        buf.append(",msgstr:");
-        for (int i = 0; i < msgstr.size(); i++) {
+        buf.append(",val:");
+        for (int i = 0; i < val.size(); i++) {
             buf.append("[");
             buf.append(i);
             buf.append("]\"");
-            buf.append(msgstr.get(i));
+            buf.append(val.get(i));
             buf.append("\"");
         }
         buf.append("}");

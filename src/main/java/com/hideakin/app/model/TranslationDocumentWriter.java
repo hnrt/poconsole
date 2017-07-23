@@ -24,8 +24,8 @@ public class TranslationDocumentWriter implements Closeable {
     public void write(List<TranslationUnit> list) throws IOException {
         for (TranslationUnit tu : list) {
             writeHeader(tu.getHeader());
-            write(MSGID, tu.getId());
-            write(MSGSTR, tu.getStr());
+            write(MSGID, tu.getKey());
+            write(MSGSTR, tu.getVal());
             out.write(NEWLINE);
         }
     }

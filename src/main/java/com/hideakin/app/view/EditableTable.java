@@ -32,8 +32,8 @@ public class EditableTable {
 
     private static final int STATUS_COLUMN = 0;
     private static final int LINE_COLUMN = 1;
-    private static final int ID_COLUMN = 2;
-    private static final int EDIT_COLUMN = 3;
+    public static final int KEY_COLUMN = 2;
+    public static final int VAL_COLUMN = 3;
     private static final String STATUS = "STATUS";
     private static final String LINE = "LINE";
     private static final String MSGID = "MSGID";
@@ -105,11 +105,11 @@ public class EditableTable {
             }
             @Override
             public void widgetSelected(SelectionEvent arg0) {
-                if (selectedHeader == ID_COLUMN) {
-                    reverseOrder[ID_COLUMN] = !reverseOrder[ID_COLUMN];
+                if (selectedHeader == KEY_COLUMN) {
+                    reverseOrder[KEY_COLUMN] = !reverseOrder[KEY_COLUMN];
                 }
-                EditableTable.this.sortById(reverseOrder[ID_COLUMN]);
-                selectedHeader = ID_COLUMN;
+                EditableTable.this.sortById(reverseOrder[KEY_COLUMN]);
+                selectedHeader = KEY_COLUMN;
             }
         });
         TableColumn colStr = new TableColumn(table, SWT.LEFT);
@@ -122,11 +122,11 @@ public class EditableTable {
             }
             @Override
             public void widgetSelected(SelectionEvent arg0) {
-                if (selectedHeader == EDIT_COLUMN) {
-                    reverseOrder[EDIT_COLUMN] = !reverseOrder[EDIT_COLUMN];
+                if (selectedHeader == VAL_COLUMN) {
+                    reverseOrder[VAL_COLUMN] = !reverseOrder[VAL_COLUMN];
                 }
-                EditableTable.this.sortByStr(reverseOrder[EDIT_COLUMN]);
-                selectedHeader = EDIT_COLUMN;
+                EditableTable.this.sortByStr(reverseOrder[VAL_COLUMN]);
+                selectedHeader = VAL_COLUMN;
             }
         });
 
@@ -206,7 +206,7 @@ public class EditableTable {
         table.setSelection(new int[0]);
         TableItem item = table.getItem(index);
         text = new Text(table, SWT.MULTI);
-        text.setText(item.getText(EDIT_COLUMN));
+        text.setText(item.getText(VAL_COLUMN));
         text.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -259,7 +259,7 @@ public class EditableTable {
             public void mouseUp(MouseEvent e) {
             }
         });
-        tableEditor.setEditor(text, item, EDIT_COLUMN);
+        tableEditor.setEditor(text, item, VAL_COLUMN);
         text.setFocus();
         text.selectAll();
         item.setText(STATUS_COLUMN, EDITING);
@@ -272,9 +272,9 @@ public class EditableTable {
         }
         TableItem item = tableEditor.getItem();
         TranslationUnit tu = (TranslationUnit)item.getData();
-        tu.getStr().set(text.getText());
-        item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
-        item.setText(EDIT_COLUMN, tu.getStr().toString());
+        tu.getVal().set(text.getText());
+        item.setText(STATUS_COLUMN, tu.getVal().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+        item.setText(VAL_COLUMN, tu.getVal().toString());
         text.dispose();
         text = null;
         table.setSelection(item);
@@ -292,7 +292,7 @@ public class EditableTable {
         }
         TableItem item = tableEditor.getItem();
         TranslationUnit tu = (TranslationUnit)item.getData();
-        item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+        item.setText(STATUS_COLUMN, tu.getVal().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
         text.dispose();
         text = null;
         table.setSelection(item);
@@ -309,8 +309,8 @@ public class EditableTable {
         TableItem item = table.getItem(index);
         TranslationUnit tu = (TranslationUnit)item.getData();
         tu.revert();
-        item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : UNCHANGED);
-        item.setText(EDIT_COLUMN, tu.getStr().toString());
+        item.setText(STATUS_COLUMN, tu.getVal().isEmpty() ? EMPTY : UNCHANGED);
+        item.setText(VAL_COLUMN, tu.getVal().toString());
         if (editCompleteListener != null) {
             EditEvent e = new EditEvent();
             e.document = document;
@@ -324,10 +324,10 @@ public class EditableTable {
         List<TranslationUnit> tuList = document.getTranslationUnit();
         for (TranslationUnit tu : tuList) {
             TableItem item = new TableItem(table, SWT.NULL);
-            item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : UNCHANGED);
+            item.setText(STATUS_COLUMN, tu.getVal().isEmpty() ? EMPTY : UNCHANGED);
             item.setText(LINE_COLUMN, "" + (tu.getLine() + tu.getHeader().size()));
-            item.setText(ID_COLUMN, tu.getId().toString());
-            item.setText(EDIT_COLUMN, tu.getStr().toString());
+            item.setText(KEY_COLUMN, tu.getKey().toString());
+            item.setText(VAL_COLUMN, tu.getVal().toString());
             item.setData(tu);
         }
         this.document = document;
@@ -344,7 +344,7 @@ public class EditableTable {
         for (int index = 0; index < count; index++) {
             TableItem item = table.getItem(index);
             TranslationUnit tu = (TranslationUnit)item.getData();
-            item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+            item.setText(STATUS_COLUMN, tu.getVal().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
         }
         if (editCompleteListener != null) {
             EditEvent e = new EditEvent();
@@ -362,14 +362,14 @@ public class EditableTable {
         List<TranslationUnit> tuList = document.getTranslationUnit();
         List<TranslationUnit> sorted = new ArrayList<>(tuList.size());
         for (TranslationUnit tu1 : tuList) {
-            int x1 = tu1.getStr().isEmpty() ? 0 : tu1.isChanged() ? 1 : 2;
+            int x1 = tu1.getVal().isEmpty() ? 0 : tu1.isChanged() ? 1 : 2;
             for (int index = 0;; index++) {
                 if (index >= sorted.size()) {
                     sorted.add(tu1);
                     break;
                 }
                 TranslationUnit tu2 = sorted.get(index); 
-                int x2 = tu2.getStr().isEmpty() ? 0 : tu2.isChanged() ? 1 : 2;
+                int x2 = tu2.getVal().isEmpty() ? 0 : tu2.isChanged() ? 1 : 2;
                 if (x1 < x2) {
                     sorted.add(index, tu1);
                     break;
@@ -387,7 +387,7 @@ public class EditableTable {
                 if (index >= sorted.size()) {
                     sorted.add(tu);
                     break;
-                } else if (tu.getId().toString().compareTo(sorted.get(index).getId().toString()) < 0) {
+                } else if (tu.getKey().toString().compareTo(sorted.get(index).getKey().toString()) < 0) {
                     sorted.add(index, tu);
                     break;
                 }
@@ -404,7 +404,7 @@ public class EditableTable {
                 if (index >= sorted.size()) {
                     sorted.add(tu);
                     break;
-                } else if (tu.getStr().toString().compareTo(sorted.get(index).getStr().toString()) < 0) {
+                } else if (tu.getVal().toString().compareTo(sorted.get(index).getVal().toString()) < 0) {
                     sorted.add(index, tu);
                     break;
                 }
@@ -417,10 +417,10 @@ public class EditableTable {
         int index = reverseOrder ? tuList.size() - 1 : 0;
         for (TranslationUnit tu : tuList) {
             TableItem item = table.getItem(index);
-            item.setText(STATUS_COLUMN, tu.getStr().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
+            item.setText(STATUS_COLUMN, tu.getVal().isEmpty() ? EMPTY : tu.isChanged() ? CHANGED : UNCHANGED);
             item.setText(LINE_COLUMN, "" + (tu.getLine() + tu.getHeader().size()));
-            item.setText(ID_COLUMN, tu.getId().toString());
-            item.setText(EDIT_COLUMN, tu.getStr().toString());
+            item.setText(KEY_COLUMN, tu.getKey().toString());
+            item.setText(VAL_COLUMN, tu.getVal().toString());
             item.setData(tu);
             index += reverseOrder ? -1 : 1;
         }
@@ -430,13 +430,13 @@ public class EditableTable {
         return document != null && table.getItemCount() > 0;
     }
 
-    public void find(String value, boolean caseSensitive, boolean forwardDirection) {
-        if (document == null) {
-            return;
+    public int find(String value, boolean caseSensitive, int subject, boolean forwardDirection) {
+        if (value == null || value.isEmpty() || subject == 0 || document == null) {
+            return -1;
         }
-        int itemCount = table.getItemCount();
+        final int itemCount = table.getItemCount();
         if (itemCount == 0) {
-            return;
+            return -1;
         }
         if (!caseSensitive) {
             value = value.toUpperCase();
@@ -452,25 +452,26 @@ public class EditableTable {
                 index = (index + itemCount - 1) % itemCount;
             }
         }
+        final boolean key = (subject & (1 << KEY_COLUMN)) != 0;
+        final boolean val = (subject & (1 << VAL_COLUMN)) != 0;
+        final int delta = forwardDirection ? 1 : (itemCount - 1);
         for (int count = itemCount; count > 0; count--) {
             TableItem item = table.getItem(index);
             TranslationUnit tu = (TranslationUnit)item.getData();
             if (caseSensitive) {
-                if (tu.getId().toString().contains(value) || tu.getStr().toString().contains(value)) {
+                if (key && tu.getKey().toString().contains(value) ||
+                    val && tu.getVal().toString().contains(value)) {
                     table.setSelection(item);
-                    return;
+                    return 1;
                 }
-            } else if (tu.getId().toString().toUpperCase().contains(value) ||
-                    tu.getStr().toString().toUpperCase().contains(value)) {
+            } else if (key && tu.getKey().toString().toUpperCase().contains(value) ||
+                       val && tu.getVal().toString().toUpperCase().contains(value)) {
                 table.setSelection(item);
-                return;
+                return 1;
             }
-            if (forwardDirection) {
-                index = (index + 1) % itemCount;
-            } else {
-                index = (index + itemCount - 1) % itemCount;
-            }
+            index = (index + delta) % itemCount;
         }
+        return 0;
     }
 
 }
