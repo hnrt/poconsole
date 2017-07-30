@@ -25,10 +25,14 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+
+import com.hideakin.app.model.TextReference;
 import com.hideakin.app.model.TranslationDocument;
 import com.hideakin.app.model.TranslationUnit;
 import com.hideakin.app.view.event.EditCompleteListener;
 import com.hideakin.app.view.event.EditEvent;
+import com.hideakin.app.view.event.TranslationUnitSelectionEvent;
+import com.hideakin.app.view.event.TranslationUnitSelectionListener;
 
 public class EditableTable {
 
@@ -59,6 +63,7 @@ public class EditableTable {
     private Text text;
     private TranslationDocument document;
     private EditCompleteListener editCompleteListener;
+    private TranslationUnitSelectionListener tuSelectionListener;
     private boolean enterEditPending; // to work properly with menu navigation
     private boolean leaveEditPending; // to work properly with IME interaction
     private int selectedHeader;
@@ -188,16 +193,30 @@ public class EditableTable {
         table.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                if (e.item == null) {
+                    return;
+                }
+                if (tuSelectionListener == null) {
+                    return;
+                }
+                TranslationUnitSelectionEvent event = new TranslationUnitSelectionEvent();
+                event.translateUnit = (TranslationUnit) e.item.getData();
+                event.document = document;
+                tuSelectionListener.translationUnitSelected(event);
             }
         });
     }
-    
+
     public void setLayoutData(Object data) {
         table.setLayoutData(data);
     }
 
     public void setEditCompleteListener(EditCompleteListener listener) {
         editCompleteListener = listener;
+    }
+
+    public void setTranslationUnitSelectionListener(TranslationUnitSelectionListener listener) {
+        tuSelectionListener = listener;
     }
 
     public boolean editInProgress() {
@@ -327,6 +346,10 @@ public class EditableTable {
             e.translateUnit = tu;
             editCompleteListener.editComplete(e);
         }
+    }
+
+    public TranslationDocument get() {
+        return document;
     }
 
     public void set(TranslationDocument document) {
@@ -529,6 +552,16 @@ public class EditableTable {
         TableItem item = table.getItem(index);
         TranslationUnit tu = (TranslationUnit)item.getData();
         return tu.getVal().toString();
+    }
+
+    public TextReference[] getSelectedRef() {
+        int index = table.getSelectionIndex();
+        if (index < 0) {
+            return null;
+        }
+        TableItem item = table.getItem(index);
+        TranslationUnit tu = (TranslationUnit)item.getData();
+        return tu.getRef(document.getPath());
     }
 
 }

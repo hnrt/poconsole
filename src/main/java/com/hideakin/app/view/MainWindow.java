@@ -26,6 +26,7 @@ public class MainWindow {
     private Shell shell;
     private SearchBar searchBar;
     private EditableTable table;
+    private FileView fileView;
 
     public MainWindow(Display display) {
         shell = new Shell(display);
@@ -46,6 +47,10 @@ public class MainWindow {
         searchBar.setLayoutData(new CustomLayoutData(CustomLayoutData.TOP | CustomLayoutData.HFILL));
         searchBar.setVisible(false);
 
+        fileView = new FileView(shell);
+        fileView.setVisible(false);
+        fileView.setLayoutData(new CustomLayoutData(CustomLayoutData.BOTTOM | CustomLayoutData.FILL));
+ 
         table = new EditableTable(shell);
         table.setEditCompleteListener(new EditCompleteListener() {
             @Override
@@ -68,6 +73,10 @@ public class MainWindow {
 
     public EditableTable getTable() {
         return table;
+    }
+
+    public FileView getFiewView() {
+        return fileView;
     }
 
     public void close() {

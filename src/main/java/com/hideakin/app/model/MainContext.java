@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Properties;
 
 import com.hideakin.app.exception.FileIoError;
-import com.hideakin.app.file.FileUtility;
+import com.hideakin.app.file.FileUtil;
 
 public class MainContext {
 
@@ -191,8 +191,8 @@ public class MainContext {
     }
 
     public TranslationDocument save(String path) throws FileIoError {
-        String path2 = FileUtility.getTempPath(path);
-        String path3 = FileUtility.getBackupPath(path);
+        String path2 = FileUtil.getTempPath(path);
+        String path3 = FileUtil.getBackupPath(path);
         document.save(path2);
         try {
             File file1 = new File(path);

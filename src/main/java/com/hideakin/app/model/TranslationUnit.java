@@ -6,6 +6,8 @@ package com.hideakin.app.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hideakin.app.file.FileUtil;
+
 public class TranslationUnit {
 
     public static final class StringList {
@@ -168,6 +170,33 @@ public class TranslationUnit {
         }
         buf.append("}");
         return buf.toString();
+    }
+
+    public TextReference[] getRef(String hint) {
+        List<TextReference> list = new ArrayList<>();
+        for (int index = 0; index < header.size(); index++) {
+            String s = header.get(index);
+            if (s.startsWith("#: ")) {
+                for (String t : s.substring(3).split(" ")) {
+                    String[] ss = t.split(":");
+                    if (ss.length == 2 && !ss[0].isEmpty()) {
+                        try {
+                            String path = FileUtil.find(ss[0], hint);
+                            if (path == null) {
+                                path = ss[0];
+                            }
+                            int line = Integer.parseInt(ss[1]);
+                            if (path != null && line > 0) {
+                                list.add(new TextReference(path, line));
+                            }
+                        } catch (NumberFormatException e) {
+                            // skip
+                        }
+                    }
+                }
+            }
+        }
+        return list.toArray(new TextReference[list.size()]);
     }
 
 }

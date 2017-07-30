@@ -6,7 +6,7 @@ package com.hideakin.app.file;
 import java.io.File;
 import java.time.LocalDateTime;
 
-public class FileUtility {
+public class FileUtil {
 
     private static final String BACKUP_EXT_LEADER = ".backup";
 
@@ -43,6 +43,11 @@ public class FileUtility {
             }
         }
         return String.format("%s%s%d", basePath, BACKUP_EXT_LEADER, maxNum + 1);        
+    }
+
+    public static String find(String filename, String basePath) {
+        FileFinder finder = new FileFinder(1000);
+        return finder.run(filename, basePath);
     }
 
 }

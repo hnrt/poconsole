@@ -14,13 +14,14 @@ import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
-
 import com.hideakin.app.exception.FileIoError;
 import com.hideakin.app.model.MainContext;
 import com.hideakin.app.model.TranslationDocument;
 import com.hideakin.app.view.EditableTable;
+import com.hideakin.app.view.FileView;
 import com.hideakin.app.view.MainWindow;
+import com.hideakin.app.view.event.TranslationUnitSelectionEvent;
+import com.hideakin.app.view.event.TranslationUnitSelectionListener;
 
 public class EventHandler {
 
@@ -51,8 +52,8 @@ public class EventHandler {
 
     public void setMainWindow(MainWindow win) {
         mainWindow = win;
-        Shell shell = mainWindow.getShell();
-        shell.addShellListener(new ShellListener() {
+
+        mainWindow.getShell().addShellListener(new ShellListener() {
             @Override
             public void shellActivated(ShellEvent e) {
             }
@@ -71,6 +72,16 @@ public class EventHandler {
             }
             @Override
             public void shellIconified(ShellEvent e) {
+            }
+        });
+
+        mainWindow.getTable().setTranslationUnitSelectionListener(new TranslationUnitSelectionListener() {
+            @Override
+            public void translationUnitSelected(TranslationUnitSelectionEvent event) {
+                FileView fv = mainWindow.getFiewView();
+                if (fv.getVisible()) {
+                    fv.parse(event.translateUnit.getRef(event.document.getPath()));
+                }
             }
         });
     }
@@ -282,6 +293,16 @@ public class EventHandler {
 
     public int find(String value, boolean caseSensitive, int subject, boolean forwardDirection) {
         return mainWindow.getTable().find(value, caseSensitive, subject, forwardDirection);
+    }
+
+    public void fileView() {
+        FileView fv = mainWindow.getFiewView();
+        boolean visible = !fv.getVisible();
+        fv.setVisible(visible);
+        mainWindow.getShell().layout();
+        if (visible) {
+            fv.parse(mainWindow.getTable().getSelectedRef());
+        }
     }
 
 }

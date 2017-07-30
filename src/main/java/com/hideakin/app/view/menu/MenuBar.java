@@ -14,6 +14,7 @@ public class MenuBar {
         menubar.setData(shell.getData());
         FileMenu.create(menubar);
         EditMenu.create(menubar);
+        ViewMenu.create(menubar);
         return menubar;
     }
 
