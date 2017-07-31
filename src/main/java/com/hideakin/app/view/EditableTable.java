@@ -192,16 +192,9 @@ public class EditableTable {
         table.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                if (e.item == null) {
-                    return;
+                if (e.item != null) {
+                    EditableTable.this.onSelected((TranslationUnit) e.item.getData());
                 }
-                if (tuSelectionListener == null) {
-                    return;
-                }
-                TranslationUnitSelectionEvent event = new TranslationUnitSelectionEvent();
-                event.translateUnit = (TranslationUnit) e.item.getData();
-                event.document = document;
-                tuSelectionListener.translationUnitSelected(event);
             }
         });
     }
@@ -516,12 +509,12 @@ public class EditableTable {
             if (caseSensitive) {
                 if (key && tu.getKey().toString().contains(value) ||
                     val && tu.getVal().toString().contains(value)) {
-                    table.setSelection(item);
+                    setSelection(item);
                     return 1;
                 }
             } else if (key && tu.getKey().toString().toUpperCase().contains(value) ||
                        val && tu.getVal().toString().toUpperCase().contains(value)) {
-                table.setSelection(item);
+                setSelection(item);
                 return 1;
             }
             index = (index + delta) % itemCount;
@@ -561,6 +554,20 @@ public class EditableTable {
         TableItem item = table.getItem(index);
         TranslationUnit tu = (TranslationUnit)item.getData();
         return tu.getRef(document.getPath());
+    }
+
+    private void setSelection(TableItem item) {
+        table.setSelection(item);
+        onSelected((TranslationUnit) item.getData());
+    }
+
+    private void onSelected(TranslationUnit translateUnit) {
+        if (tuSelectionListener != null) {
+            TranslationUnitSelectionEvent event = new TranslationUnitSelectionEvent();
+            event.translateUnit = translateUnit;
+            event.document = document;
+            tuSelectionListener.translationUnitSelected(event);
+        }
     }
 
 }

@@ -20,9 +20,10 @@ import com.hideakin.app.view.layout.CustomLayoutData;
 public class FileView extends Composite {
 
     private static final String LINE = "LINE";
-    private static final String CONTENTS = "CONTENTS";
 
     private Table table;
+    private TableColumn colLine;
+    private TableColumn colText;
     private Combo combo;
     private TextFile textFile;
     private TextReference[] entries;
@@ -72,24 +73,28 @@ public class FileView extends Composite {
         table = new Table(this, SWT.BORDER | SWT.FULL_SELECTION);
         table.setLayoutData(new CustomLayoutData(CustomLayoutData.HFILL | CustomLayoutData.BOTTOM | CustomLayoutData.VFILL));
 
-        TableColumn colLine = new TableColumn(table, SWT.LEFT);
-        colLine.setText(LINE);
+        colLine = new TableColumn(table, SWT.LEFT);
+        colLine.setText(" ");
         colLine.setWidth(100);
 
-        TableColumn colText = new TableColumn(table, SWT.LEFT);
-        colText.setText(CONTENTS);
+        colText = new TableColumn(table, SWT.LEFT);
+        colText.setText(" ");
         colText.setWidth(400);
 
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
     }
 
-    public void parse(TextReference[] entries) {
+    public void set(TextReference[] entries) {
         combo.removeAll();
         this.entries = entries;
         if (entries == null || entries.length == 0) {
+            colLine.setText(" ");
+            colText.setText(" ");
             table.setItemCount(0);
             textFile = null;
+            combo.setSize(combo.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+            combo.getParent().layout();
             return;
         }
         for (TextReference entry : entries) {
@@ -103,6 +108,8 @@ public class FileView extends Composite {
 
     private void load(TextReference entry) {
         if (textFile == null || !entry.getPath().equals(textFile.getPath())) {
+            colLine.setText(LINE);
+            colText.setText(entry.getPath());
             table.setItemCount(0);
             textFile = null;
             try {

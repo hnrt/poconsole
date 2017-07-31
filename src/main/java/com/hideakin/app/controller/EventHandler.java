@@ -79,7 +79,7 @@ public class EventHandler {
             public void translationUnitSelected(TranslationUnitSelectionEvent event) {
                 FileView fv = mainWindow.getFiewView();
                 if (fv.getVisible()) {
-                    fv.parse(event.translateUnit.getRef(event.document.getPath()));
+                    fv.set(event.translateUnit.getRef(event.document.getPath()));
                 }
             }
         });
@@ -299,9 +299,7 @@ public class EventHandler {
         boolean visible = !fv.getVisible();
         fv.setVisible(visible);
         mainWindow.getShell().layout();
-        if (visible) {
-            fv.parse(mainWindow.getTable().getSelectedRef());
-        }
+        fv.set(visible ? mainWindow.getTable().getSelectedRef() : null);
     }
 
 }
