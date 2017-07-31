@@ -1,6 +1,5 @@
-/**
- * Copyright (C) 2017 Hideaki Narita
- */
+// Copyright (C) 2017 Hideaki Narita
+
 package com.hideakin.app.controller;
 
 import java.io.File;

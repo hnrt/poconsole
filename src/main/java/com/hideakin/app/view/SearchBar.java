@@ -1,3 +1,5 @@
+// Copyright (C) 2017 Hideaki Narita
+
 package com.hideakin.app.view;
 
 import org.eclipse.swt.SWT;

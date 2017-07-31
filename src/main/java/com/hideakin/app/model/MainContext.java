@@ -1,6 +1,5 @@
-/**
- * Copyright (C) 2017 Hideaki Narita
- */
+// Copyright (C) 2017 Hideaki Narita
+
 package com.hideakin.app.model;
 
 import java.io.BufferedReader;
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import com.hideakin.app.encoding.EncodingUtil;
 import com.hideakin.app.exception.FileIoError;
 import com.hideakin.app.file.FileUtil;
 
@@ -28,7 +28,7 @@ public class MainContext {
     private static final String APP_DIR_NAME = "/.poconsole/";
     private static final String PROPERTIES_NAME = "poconsole.properties";
     private static final String PROPERTIES_COMMENT = "poconsole";
-    private static final String UTF_8 = "UTF-8";
+    private static final String DEFAULT_CS = EncodingUtil.UTF_8;
     private static final String RUFL_NAME = "RecentlyUsed.lst";
     private static final String FILE_ENCODING = "file.encoding";
 
@@ -56,7 +56,7 @@ public class MainContext {
 
         public void load() {
             loading = true;
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(path), UTF_8))) {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(path), DEFAULT_CS))) {
                 String text;
                 while ((text = in.readLine()) != null) {
                     String[] portions = text.split(SEPARATOR);
@@ -159,11 +159,11 @@ public class MainContext {
         if (!dir.isDirectory()) {
             dir.mkdirs();
         }
-        try (Reader reader = new InputStreamReader(new FileInputStream(getPropertiesPath()), UTF_8)) {
+        try (Reader reader = new InputStreamReader(new FileInputStream(getPropertiesPath()), DEFAULT_CS)) {
             properties.load(reader);
             String encoding = getProperty(FILE_ENCODING);
             if (encoding == null) {
-                setProperty(FILE_ENCODING, UTF_8);
+                setProperty(FILE_ENCODING, DEFAULT_CS);
             }
         } catch (Exception e) {
             e.printStackTrace();
