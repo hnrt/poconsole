@@ -26,6 +26,10 @@ public class TextReference {
         return new File(path).getName();
     }
 
+    public String toShortString() {
+        return getName() + ":" + line;
+    }
+
     @Override
     public String toString() {
         return path + ":" + line;

@@ -93,7 +93,7 @@ public class FileView extends Composite {
             return;
         }
         for (TextReference entry : entries) {
-            combo.add(entry.getName() + ":" + entry.getLine());
+            combo.add(entry.toShortString());
         }
         combo.select(0);
         combo.setSize(combo.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -103,7 +103,6 @@ public class FileView extends Composite {
 
     private void load(TextReference entry) {
         if (textFile == null || !entry.getPath().equals(textFile.getPath())) {
-            System.out.println("load(" + entry.toString() + ")");
             table.setItemCount(0);
             textFile = null;
             try {
