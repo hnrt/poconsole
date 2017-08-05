@@ -35,9 +35,4 @@ public class TextReference {
         return path + ":" + line;
     }
 
-    public static TextReference parse(String value) {
-        String[] ss = value.split(":");
-        return new TextReference(ss[0], Integer.parseInt(ss[1]));
-    }
-
 }
