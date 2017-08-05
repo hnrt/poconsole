@@ -108,7 +108,7 @@ public class EditMenu {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                EventHandler.getInstance().find();
+                EventHandler.getInstance().findView();
             }
 
             @Override

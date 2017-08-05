@@ -285,7 +285,7 @@ public class EventHandler {
         return mainWindow.getTable().canFind();
     }
 
-    public void find() {
+    public void findView() {
         mainWindow.getSearchBar().setVisible(!mainWindow.getSearchBar().getVisible());
         mainWindow.getShell().layout();
     }
