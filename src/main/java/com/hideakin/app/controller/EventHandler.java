@@ -79,7 +79,11 @@ public class EventHandler {
             public void translationUnitSelected(TranslationUnitSelectionEvent event) {
                 FileView fv = mainWindow.getFiewView();
                 if (fv.getVisible()) {
-                    fv.set(event.translateUnit.getRef(event.document.getPath()));
+                    if (event.translateUnit != null) {
+                        fv.set(event.translateUnit.getRef(event.document.getPath()));
+                    } else {
+                        fv.set(null);
+                    }
                 }
             }
         });
@@ -225,6 +229,17 @@ public class EventHandler {
             return;
         }
         openFile(path, false);
+    }
+
+    public void close() {
+        int response = askToSave();
+        if (response == SWT.YES) {
+            saveFile();
+        } else if (response == SWT.CANCEL) {
+            return;
+        }
+        mainContext.close();
+        mainWindow.getTable().set(null);
     }
 
     public boolean canCopy() {

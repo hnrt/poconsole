@@ -93,7 +93,7 @@ public class FileView extends Composite {
             colText.setText(" ");
             table.setItemCount(0);
             textFile = null;
-            combo.setSize(combo.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+            combo.setSize(100, combo.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
             combo.getParent().layout();
             return;
         }

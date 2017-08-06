@@ -28,49 +28,55 @@ public class FileMenu {
         MenuItem itemOpen = new MenuItem(menu, SWT.PUSH);
         itemOpen.setText("&Open...");
         itemOpen.addSelectionListener(new SelectionListener() {
-
             @Override
             public void widgetSelected(SelectionEvent e) {
                 EventHandler.getInstance().openFile();
             }
-
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 widgetSelected(e);
             }
-            
         });
 
         MenuItem itemSave = new MenuItem(menu, SWT.PUSH);
         itemSave.setText("&Save");
         itemSave.addSelectionListener(new SelectionListener() {
-
             @Override
             public void widgetSelected(SelectionEvent e) {
                 EventHandler.getInstance().saveFile();
             }
-
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 widgetSelected(e);
             }
-            
         });
 
         MenuItem itemSaveAs = new MenuItem(menu, SWT.PUSH);
         itemSaveAs.setText("Save &as...");
         itemSaveAs.addSelectionListener(new SelectionListener() {
-
             @Override
             public void widgetSelected(SelectionEvent e) {
                 EventHandler.getInstance().saveFileAs();
             }
-
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 widgetSelected(e);
             }
-            
+        });
+
+        new MenuItem(menu, SWT.SEPARATOR);
+
+        MenuItem itemClose = new MenuItem(menu, SWT.PUSH);
+        itemClose.setText("&Close");
+        itemClose.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                EventHandler.getInstance().close();
+            }
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                widgetSelected(e);
+            }
         });
 
         new MenuItem(menu, SWT.SEPARATOR);
@@ -79,11 +85,9 @@ public class FileMenu {
         itemRecent.setText("&Recently used");
         Menu menuRecent = new Menu(itemRecent);
         menuRecent.addMenuListener(new MenuListener() {
-
             @Override
             public void menuHidden(MenuEvent e) {
             }
-
             @Override
             public void menuShown(MenuEvent e) {
                 for (MenuItem item : menuRecent.getItems()) {
@@ -120,7 +124,6 @@ public class FileMenu {
                     });
                 }
             }
-
         });
         itemRecent.setMenu(menuRecent);
 
@@ -129,32 +132,27 @@ public class FileMenu {
         MenuItem itemQuit = new MenuItem(menu, SWT.PUSH);
         itemQuit.setText("&Quit");
         itemQuit.addSelectionListener(new SelectionListener() {
-
             @Override
             public void widgetSelected(SelectionEvent e) {
                 EventHandler.getInstance().quit();
             }
-
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 widgetSelected(e);
             }
-            
         });
 
         menu.addMenuListener(new MenuListener() {
-            
             @Override
             public void menuHidden(MenuEvent e) {
             }
-
             @Override
             public void menuShown(MenuEvent e) {
                 boolean canSave = MainContext.getInstance().getDocument() != null;
                 itemSave.setEnabled(canSave);
                 itemSaveAs.setEnabled(canSave);
+                itemClose.setEnabled(canSave);
             }
-
         });
 
         return itemFile;        

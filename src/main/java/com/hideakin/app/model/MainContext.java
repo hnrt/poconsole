@@ -139,6 +139,17 @@ public class MainContext {
         return document;
     }
 
+    public void close() {
+        if (document != null) {
+            try (OperationLogWriter out = OperationLog.getWriter(getOperationLogPath())) {
+                out.write(OperationKind.CLOSE, document.getPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            document = null;
+        }
+    }
+
     private String getAppDirPath() {
         return System.getenv(HOME) + APP_DIR_NAME;
     }

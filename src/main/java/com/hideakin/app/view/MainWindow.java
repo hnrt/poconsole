@@ -54,7 +54,11 @@ public class MainWindow {
         table.setEditCompleteListener(new EditCompleteListener() {
             @Override
             public void editComplete(EditEvent e) {
-                setTitle(new File(e.document.getPath()), e.document.isChanged());
+                if (e.document != null) {
+                    setTitle(new File(e.document.getPath()), e.document.isChanged());
+                } else {
+                    setTitle(MainContext.APP_DISPLAY_NAME);
+                }
             }
         });
         table.setLayoutData(new CustomLayoutData(CustomLayoutData.BOTTOM | CustomLayoutData.FILL));

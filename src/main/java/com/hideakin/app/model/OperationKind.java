@@ -5,6 +5,7 @@ package com.hideakin.app.model;
 public enum OperationKind {
 
     LOAD,
-    SAVE;
+    SAVE,
+    CLOSE;
 
 }

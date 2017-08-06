@@ -346,16 +346,19 @@ public class EditableTable {
 
     public void set(TranslationDocument document) {
         table.setItemCount(0);
-        List<TranslationUnit> tuList = document.getTranslationUnit();
-        for (TranslationUnit tu : tuList) {
-            TableItem item = new TableItem(table, SWT.NULL);
-            setStatusText(item, tu, table.indexOf(item));
-            item.setText(LINE_COLUMN, "" + (tu.getLine() + tu.getHeader().size()));
-            item.setText(KEY_COLUMN, tu.getKey().toString());
-            item.setText(VAL_COLUMN, tu.getVal().toString());
-            item.setData(tu);
+        if (document != null) {
+            List<TranslationUnit> tuList = document.getTranslationUnit();
+            for (TranslationUnit tu : tuList) {
+                TableItem item = new TableItem(table, SWT.NULL);
+                setStatusText(item, tu, table.indexOf(item));
+                item.setText(LINE_COLUMN, "" + (tu.getLine() + tu.getHeader().size()));
+                item.setText(KEY_COLUMN, tu.getKey().toString());
+                item.setText(VAL_COLUMN, tu.getVal().toString());
+                item.setData(tu);
+            }
         }
         this.document = document;
+        setSelection(null);
         if (editCompleteListener != null) {
             EditEvent e = new EditEvent();
             e.document = document;
@@ -557,17 +560,20 @@ public class EditableTable {
     }
 
     private void setSelection(TableItem item) {
-        table.setSelection(item);
-        onSelected((TranslationUnit) item.getData());
+        if (item != null) {
+            table.setSelection(item);
+            onSelected((TranslationUnit) item.getData());
+        } else {
+            table.setSelection(-1);
+            onSelected(null);
+        }
     }
 
     private void onSelected(TranslationUnit translateUnit) {
-        if (tuSelectionListener != null) {
-            TranslationUnitSelectionEvent event = new TranslationUnitSelectionEvent();
-            event.translateUnit = translateUnit;
-            event.document = document;
-            tuSelectionListener.translationUnitSelected(event);
-        }
+        TranslationUnitSelectionEvent event = new TranslationUnitSelectionEvent();
+        event.translateUnit = translateUnit;
+        event.document = document;
+        tuSelectionListener.translationUnitSelected(event);
     }
 
 }
