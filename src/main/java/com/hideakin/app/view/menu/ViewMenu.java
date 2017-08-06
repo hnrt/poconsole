@@ -48,19 +48,31 @@ public class ViewMenu {
             }
         });
 
+        new MenuItem(menu, SWT.SEPARATOR);
+
+        MenuItem itemRefresh = new MenuItem(menu, SWT.PUSH);
+        itemRefresh.setText("&Refresh");
+        itemRefresh.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                EventHandler.getInstance().refresh();
+            }
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                widgetSelected(e);
+            }
+        });
+
         menu.addMenuListener(new MenuListener() {
-            
             @Override
             public void menuHidden(MenuEvent e) {
             }
-
             @Override
             public void menuShown(MenuEvent e) {
                 MainWindow win = (MainWindow) menubar.getData();
                 itemFind.setSelection(win.getSearchBar().getVisible());
                 itemFile.setSelection(win.getFiewView().getVisible());
             }
-
         });
 
         return itemView;

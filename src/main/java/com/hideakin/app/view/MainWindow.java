@@ -10,6 +10,7 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import com.hideakin.app.model.MainContext;
 import com.hideakin.app.view.event.EditCompleteListener;
 import com.hideakin.app.view.event.EditEvent;
 import com.hideakin.app.view.layout.CustomLayout;
@@ -18,7 +19,6 @@ import com.hideakin.app.view.menu.MenuBar;
 
 public class MainWindow {
 
-    private static final String DEFAULT_TITLE = "gettext Portable Object Console";
     private static final String TITLE_TAG_CHANGED = "[CHANGED] ";
     private static final String FORMAT_TITLE_PATH = "%s%s in %s";
 
@@ -34,10 +34,10 @@ public class MainWindow {
         shell.setLayout(new CustomLayout(SWT.VERTICAL));
         shell.addControlListener(new ControlListener() {
             @Override
-            public void controlMoved(ControlEvent arg0) {
+            public void controlMoved(ControlEvent event) {
             }
             @Override
-            public void controlResized(ControlEvent arg0) {
+            public void controlResized(ControlEvent event) {
                 shell.layout();
             }
         });
@@ -59,7 +59,7 @@ public class MainWindow {
         });
         table.setLayoutData(new CustomLayoutData(CustomLayoutData.BOTTOM | CustomLayoutData.FILL));
 
-        setTitle(DEFAULT_TITLE);
+        setTitle(MainContext.APP_DISPLAY_NAME);
     }
 
     public Shell getShell() {

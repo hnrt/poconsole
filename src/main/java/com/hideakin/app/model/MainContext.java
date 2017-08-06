@@ -19,13 +19,18 @@ import com.hideakin.app.file.FileUtil;
 
 public class MainContext {
 
+    public static final String APP_NAME = "poconsole";
+    public static final String APP_DISPLAY_NAME = "gettext Portable Object Console";
+    public static final String APP_VERSION = "Version 1.0";
+    public static final String COPYRIGHT = "Copyright (C) 2017 Hideaki Narita";
+
     private static final String HOME = "HOME";
     private static final String APP_DIR_NAME = "/.poconsole/";
     private static final String PROPERTIES_NAME = "poconsole.properties";
     private static final String PROPERTIES_COMMENT = "poconsole";
-    private static final Charset CHARSET = StandardCharsets.UTF_8;
     private static final String RUFL_NAME = "RecentlyUsed.lst";
     private static final String FILE_ENCODING = "file.encoding";
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
 
     private static MainContext singleton;
 

@@ -302,4 +302,21 @@ public class EventHandler {
         fv.set(visible ? mainWindow.getTable().getSelectedRef() : null);
     }
 
+    public void refresh() {
+        mainWindow.getShell().layout();
+    }
+
+    public void about() {
+        MessageBox box = new MessageBox(mainWindow.getShell(), SWT.OK);
+        box.setText("About");
+        StringBuilder sb = new StringBuilder();
+        sb.append(MainContext.APP_DISPLAY_NAME);
+        sb.append("\n");
+        sb.append(MainContext.APP_VERSION);
+        sb.append("\n");
+        sb.append(MainContext.COPYRIGHT);
+        box.setMessage(sb.toString());
+        box.open();
+    }
+
 }

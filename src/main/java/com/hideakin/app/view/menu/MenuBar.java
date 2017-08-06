@@ -14,6 +14,7 @@ public class MenuBar {
         FileMenu.create(menubar);
         EditMenu.create(menubar);
         ViewMenu.create(menubar);
+        HelpMenu.create(menubar);
         return menubar;
     }
 
