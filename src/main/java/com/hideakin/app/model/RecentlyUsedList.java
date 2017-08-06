@@ -2,25 +2,13 @@
 
 package com.hideakin.app.model;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RecentlyUsedList {
 
-    private static final Charset CHARSET = StandardCharsets.UTF_8;
-    private static final String SEPARATOR = "\t";
-    private static final String NEWLINE = System.lineSeparator();
     public static final int MAX_COUNT = 10;
 
     private String path;
@@ -39,12 +27,11 @@ public class RecentlyUsedList {
 
     public void load() {
         loading = true;
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(path), CHARSET))) {
-            String text;
-            while ((text = in.readLine()) != null) {
-                String[] portions = text.split(SEPARATOR);
-                if (portions.length == 2) {
-                    File file = new File(portions[1]);
+        try (OperationLogReader in = OperationLog.getReader(path)) {
+            Operation entry;
+            while ((entry = in.read()) != null) {
+                if (entry.getKind() == OperationKind.LOAD) {
+                    File file = new File(entry.getPath());
                     if (file.exists()) {
                         add(file.getCanonicalPath());
                     }
@@ -79,14 +66,8 @@ public class RecentlyUsedList {
     }
 
     private void save(String entry) {
-        try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true), CHARSET))) {
-            LocalDateTime dt = LocalDateTime.now();
-            out.write(String.format("%d-%02d-%02d %02d:%02d:%02d",
-                    dt.getYear(), dt.getMonthValue(), dt.getDayOfMonth(),
-                    dt.getHour(), dt.getMinute(), dt.getSecond()));
-            out.write(SEPARATOR);
-            out.write(entry);
-            out.write(NEWLINE);
+        try (OperationLogWriter out = OperationLog.getWriter(path)) {
+            out.write(OperationKind.LOAD, entry);
         } catch (IOException e) {
             e.printStackTrace();
         }

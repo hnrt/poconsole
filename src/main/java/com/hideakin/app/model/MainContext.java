@@ -5,6 +5,7 @@ package com.hideakin.app.model;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -28,7 +29,7 @@ public class MainContext {
     private static final String APP_DIR_NAME = "/.poconsole/";
     private static final String PROPERTIES_NAME = "poconsole.properties";
     private static final String PROPERTIES_COMMENT = "poconsole";
-    private static final String RUFL_NAME = "RecentlyUsed.lst";
+    private static final String OPLOG_NAME = "operation.log";
     private static final String FILE_ENCODING = "file.encoding";
     private static final Charset CHARSET = StandardCharsets.UTF_8;
 
@@ -44,7 +45,7 @@ public class MainContext {
 
     private MainContext() {
         properties = new Properties();
-        recentlyUsed = new RecentlyUsedList(getRecentlyUsedFileListPath());
+        recentlyUsed = new RecentlyUsedList(getOperationLogPath());
     }
 
     public static MainContext getInstance() {
@@ -127,6 +128,11 @@ public class MainContext {
                 file1.renameTo(file3);
             }
             file2.renameTo(file1);
+            try (OperationLogWriter out = OperationLog.getWriter(getOperationLogPath())) {
+                out.write(OperationKind.SAVE, path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } catch (Exception e) {
             throw new FileIoError(path, e);
         }
@@ -141,8 +147,8 @@ public class MainContext {
         return getAppDirPath() + PROPERTIES_NAME;
     }
 
-    private String getRecentlyUsedFileListPath() {
-        return getAppDirPath() + RUFL_NAME;
+    public String getOperationLogPath() {
+        return getAppDirPath() + OPLOG_NAME;
     }
 
 }
