@@ -16,8 +16,8 @@ A jar file that includes all dependencies can be built as follows:
 
     ./gradlew fatJar
 
-If successful, poconsole-all-1.0.jar will be created in build/libs directory.
+If successful, poconsole-all.jar will be created in build/libs directory.
 
 ## How to run
 
-    java -jar build/libs/poconsole-all-1.0.jar
+    java -jar build/libs/poconsole-all.jar
